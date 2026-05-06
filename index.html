@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Thompson Projects" />
+  <title>Thompson's Project List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sky: #4FC3F7;
+      --sun: #FFD54F;
+      --grass: #81C784;
+      --coral: #FF8A65;
+      --purple: #CE93D8;
+      --navy: #1a2744;
+      --card-bg: #ffffff;
+      --page-bg: #EEF6FF;
+      --text: #1a2744;
+      --muted: #6b7a99;
+      --radius: 20px;
+      --shadow: 0 6px 24px rgba(26,39,68,0.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy);
+      padding: 28px 24px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 60%, rgba(79,195,247,.25) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(206,147,216,.20) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    header h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.9rem, 6vw, 3rem);
+      color: var(--sun);
+      letter-spacing: 1px;
+      position: relative;
+    }
+    header p.tagline {
+      color: rgba(255,255,255,.70);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 4px;
+      position: relative;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 18px 20px 8px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .controls label {
+      font-weight: 800;
+      font-size: .85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+    .sort-btn {
+      background: white;
+      border: 2.5px solid transparent;
+      border-radius: 50px;
+      padding: 7px 18px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      transition: all .18s;
+    }
+    .sort-btn:hover { border-color: var(--sky); color: #0288d1; }
+    .sort-btn.active {
+      background: var(--navy);
+      color: var(--sun);
+      border-color: var(--navy);
+    }
+
+    .search-wrap {
+      margin-left: auto;
+      position: relative;
+    }
+    .search-wrap input {
+      border: 2.5px solid #d8e4f0;
+      border-radius: 50px;
+      padding: 8px 18px 8px 38px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--navy);
+      outline: none;
+      width: 190px;
+      transition: border-color .2s;
+    }
+    .search-wrap input:focus { border-color: var(--sky); }
+    .search-wrap .icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: var(--muted); pointer-events: none;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 22px;
+      padding: 16px 20px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform .2s, box-shadow .2s;
+      animation: fadeUp .35s ease both;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(26,39,68,.15);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-banner {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      background: #c9ddf0;
+      display: block;
+    }
+    .card-banner.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+
+    .card-accent {
+      height: 5px;
+    }
+
+    .card-body {
+      padding: 16px 18px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-name {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+    .card-desc {
+      font-size: .9rem;
+      line-height: 1.55;
+      color: #4a5568;
+      flex: 1;
+    }
+
+    .card-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 0 18px 16px;
+    }
+    .link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--page-bg);
+      border: 2px solid #d8e4f0;
+      border-radius: 50px;
+      padding: 5px 12px;
+      font-size: .8rem;
+      font-weight: 700;
+      color: #0288d1;
+      text-decoration: none;
+      transition: background .15s, border-color .15s;
+    }
+    .link-pill:hover {
+      background: var(--sky);
+      color: white;
+      border-color: var(--sky);
+    }
+    .link-pill .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      grid-column: 1/-1;
+    }
+    .empty .emoji { font-size: 3rem; margin-bottom: 12px; }
+    .empty p { font-size: 1.1rem; font-weight: 700; }
+
+    /* ── EDIT MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(26,39,68,.55);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(0,0,0,.25);
+      animation: popIn .2s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(.92); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .modal h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.6rem;
+      color: var(--navy);
+      margin-bottom: 20px;
+    }
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .form-row label {
+      font-size: .82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+    }
+    .form-row input, .form-row textarea, .form-row select {
+      border: 2.5px solid #d8e4f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      color: var(--navy);
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .form-row input:focus, .form-row textarea:focus { border-color: var(--sky); }
+    .form-row textarea { resize: vertical; min-height: 80px; }
+
+    .link-entry { display: flex; gap: 8px; margin-bottom: 8px; }
+    .link-entry input { flex: 1; }
+    .btn-remove {
+      background: #fee2e2; border: none; border-radius: 10px;
+      padding: 0 12px; color: #ef4444; font-weight: 800;
+      cursor: pointer; font-size: 1.1rem;
+    }
+    .btn-add-link {
+      background: none; border: 2px dashed #d8e4f0;
+      border-radius: 12px; padding: 8px 16px;
+      font-family: 'Nunito', sans-serif; font-weight: 700;
+      color: var(--muted); cursor: pointer; width: 100%;
+      font-size: .9rem; transition: border-color .2s, color .2s;
+    }
+    .btn-add-link:hover { border-color: var(--sky); color: #0288d1; }
+
+    .modal-actions {
+      display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end;
+    }
+    .btn-cancel {
+      background: #f1f5f9; border: none; border-radius: 12px;
+      padding: 10px 22px; font-family: 'Nunito', sans-serif;
+      font-weight: 700; color: var(--muted); cursor: pointer;
+      font-size: .95rem;
+    }
+    .btn-save {
+      background: var(--navy); border: none; border-radius: 12px;
+      padding: 10px 26px; font-family: 'Nunito', sans-serif;
+      font-weight: 800; color: var(--sun); cursor: pointer;
+      font-size: .95rem; transition: opacity .15s;
+    }
+    .btn-save:hover { opacity: .88; }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed;
+      bottom: 28px; right: 24px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--coral);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 20px rgba(255,138,101,.50);
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      z-index: 50;
+    }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 10px 28px rgba(255,138,101,.60); }
+
+    /* ── CARD EDIT/DELETE BUTTONS ── */
+    .card-meta {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 0 14px 14px;
+    }
+    .btn-edit, .btn-delete {
+      border: none; border-radius: 8px; padding: 5px 12px;
+      font-family: 'Nunito', sans-serif; font-size: .78rem;
+      font-weight: 700; cursor: pointer;
+    }
+    .btn-edit { background: #e0f2fe; color: #0288d1; }
+    .btn-delete { background: #fee2e2; color: #ef4444; }
+
+    /* color accents cycle */
+    .accent-0 { background: var(--sky); }
+    .accent-1 { background: var(--grass); }
+    .accent-2 { background: var(--coral); }
+    .accent-3 { background: var(--sun); }
+    .accent-4 { background: var(--purple); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🚀 Thompson's Project List</h1>
+  <p class="tagline">Explore · Learn · Create</p>
+</header>
+
+<div class="controls">
+  <label>Sort:</label>
+  <button class="sort-btn active" data-sort="added">Recently Added</button>
+  <button class="sort-btn" data-sort="az">A → Z</button>
+  <button class="sort-btn" data-sort="za">Z → A</button>
+
+  <div class="search-wrap">
+    <span class="icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search projects…" />
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" title="Add project">＋</button>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modalTitle">✏️ Add a Project</h2>
+
+    <div class="form-row">
+      <label>Project Name</label>
+      <input type="text" id="fName" placeholder="e.g. Volcano Science Experiment" />
+    </div>
+    <div class="form-row">
+      <label>Description (2–3 lines)</label>
+      <textarea id="fDesc" placeholder="What is this project about?"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Picture (image URL or emoji)</label>
+      <input type="text" id="fImg" placeholder="https://... or paste an emoji like 🌋" />
+    </div>
+    <div class="form-row">
+      <label>Colour</label>
+      <select id="fColor">
+        <option value="accent-0">Sky Blue</option>
+        <option value="accent-1">Green</option>
+        <option value="accent-2">Coral</option>
+        <option value="accent-3">Yellow</option>
+        <option value="accent-4">Purple</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Useful Links</label>
+      <div id="linksContainer"></div>
+      <button class="btn-add-link" id="addLinkBtn">+ Add a link</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancelBtn">Cancel</button>
+      <button class="btn-save" id="saveBtn">Save Project</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────────────────
+  const STORAGE_KEY = 'thompson_projects_v1';
+
+  const SAMPLE = [
+    {
+      id: 1,
+      name: "Volcano Science Experiment",
+      desc: "Build a model volcano and make it erupt with baking soda and vinegar! Learn about chemical reactions and how real volcanoes work. Great for a science fair or a fun afternoon at home.",
+      img: "🌋",
+      color: "accent-2",
+      links: [
+        { label: "How Volcanoes Work", url: "https://kids.nationalgeographic.com/science/article/volcano" },
+        { label: "Step-by-Step Guide", url: "https://www.sciencekids.co.nz/projects/volcanicreaction.html" }
+      ],
+      added: 1
+    },
+    {
+      id: 2,
+      name: "Lego Bridge Challenge",
+      desc: "Design and build the strongest bridge you can using only Lego bricks. Test how much weight it can hold and try different arch and beam shapes. Engineering at its most fun!",
+      img: "🧱",
+      color: "accent-0",
+      links: [
+        { label: "Bridge Types Explained", url: "https://www.dkfindout.com/us/science/bridges/" },
+        { label: "Lego Ideas", url: "https://www.lego.com/en-us/themes/ideas" }
+      ],
+      added: 2
+    },
+    {
+      id: 3,
+      name: "Backyard Bird Watching",
+      desc: "Set up a bird feeder and keep a journal of every bird you spot. Use a field guide or app to identify each species and draw your favourites. You might be surprised how many visit!",
+      img: "🦜",
+      color: "accent-1",
+      links: [
+        { label: "All About Birds", url: "https://www.allaboutbirds.org" },
+        { label: "Merlin Bird ID App", url: "https://merlin.allaboutbirds.org" }
+      ],
+      added: 3
+    }
+  ];
+
+  let projects = [];
+  let currentSort = 'added';
+  let editingId = null;
+  let linkCount = 0;
+
+  function load() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    projects = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(SAMPLE));
+  }
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); }
+
+  // ── RENDER ────────────────────────────────────────────────────────────
+  function render() {
+    const grid = document.getElementById('grid');
+    const q = document.getElementById('searchInput').value.toLowerCase();
+
+    let list = [...projects];
+    if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+
+    if (currentSort === 'az') list.sort((a,b) => a.name.localeCompare(b.name));
+    else if (currentSort === 'za') list.sort((a,b) => b.name.localeCompare(a.name));
+    else list.sort((a,b) => b.added - a.added);
+
+    if (!list.length) {
+      grid.innerHTML = `<div class="empty"><div class="emoji">🔭</div><p>No projects found!</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map((p, i) => {
+      const isImg = p.img && p.img.startsWith('http');
+      const banner = isImg
+        ? `<img class="card-banner" src="${p.img}" alt="${p.name}" loading="lazy" />`
+        : `<div class="card-banner placeholder">${p.img || '📁'}</div>`;
+
+      const links = (p.links || []).map(l =>
+        `<a class="link-pill" href="${l.url}" target="_blank" rel="noopener">
+           <span class="dot"></span>${l.label}
+         </a>`
+      ).join('');
+
+      return `
+        <div class="card" style="animation-delay:${i * 0.05}s">
+          ${banner}
+          <div class="card-accent ${p.color || 'accent-0'}"></div>
+          <div class="card-body">
+            <div class="card-name">${p.name}</div>
+            <div class="card-desc">${p.desc}</div>
+          </div>
+          ${links ? `<div class="card-links">${links}</div>` : ''}
+          <div class="card-meta">
+            <button class="btn-edit" onclick="openEdit(${p.id})">✏️ Edit</button>
+            <button class="btn-delete" onclick="deleteProject(${p.id})">🗑 Delete</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── SORT BUTTONS ──────────────────────────────────────────────────────
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSort = btn.dataset.sort;
+      render();
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', render);
+
+  // ── MODAL ─────────────────────────────────────────────────────────────
+  function openModal(title) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('overlay').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+    editingId = null;
+    resetForm();
+  }
+
+  function resetForm() {
+    document.getElementById('fName').value = '';
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fImg').value = '';
+    document.getElementById('fColor').value = 'accent-0';
+    document.getElementById('linksContainer').innerHTML = '';
+    linkCount = 0;
+  }
+
+  function addLinkRow(label = '', url = '') {
+    linkCount++;
+    const id = linkCount;
+    const div = document.createElement('div');
+    div.className = 'link-entry';
+    div.id = `le-${id}`;
+    div.innerHTML = `
+      <input type="text" placeholder="Label (e.g. NASA Kids)" value="${label}" class="ll" />
+      <input type="text" placeholder="https://..." value="${url}" class="lu" />
+      <button class="btn-remove" onclick="document.getElementById('le-${id}').remove()">×</button>`;
+    document.getElementById('linksContainer').appendChild(div);
+  }
+
+  document.getElementById('addLinkBtn').addEventListener('click', () => addLinkRow());
+  document.getElementById('fabBtn').addEventListener('click', () => { editingId = null; resetForm(); openModal('✏️ Add a Project'); });
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  document.getElementById('overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+  window.openEdit = function(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    editingId = id;
+    resetForm();
+    document.getElementById('fName').value = p.name;
+    document.getElementById('fDesc').value = p.desc;
+    document.getElementById('fImg').value = p.img || '';
+    document.getElementById('fColor').value = p.color || 'accent-0';
+    (p.links || []).forEach(l => addLinkRow(l.label, l.url));
+    openModal('✏️ Edit Project');
+  };
+
+  window.deleteProject = function(id) {
+    if (!confirm('Delete this project?')) return;
+    projects = projects.filter(p => p.id !== id);
+    save(); render();
+  };
+
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const name = document.getElementById('fName').value.trim();
+    const desc = document.getElementById('fDesc').value.trim();
+    if (!name) { alert('Please enter a project name!'); return; }
+
+    const img = document.getElementById('fImg').value.trim();
+    const color = document.getElementById('fColor').value;
+    const linkEls = document.querySelectorAll('.link-entry');
+    const links = [];
+    linkEls.forEach(el => {
+      const label = el.querySelector('.ll').value.trim();
+      const url = el.querySelector('.lu').value.trim();
+      if (label && url) links.push({ label, url });
+    });
+
+    if (editingId) {
+      const p = projects.find(x => x.id === editingId);
+      Object.assign(p, { name, desc, img, color, links });
+    } else {
+      const maxId = projects.reduce((m, p) => Math.max(m, p.id), 0);
+      projects.push({ id: maxId + 1, name, desc, img, color, links, added: Date.now() });
+    }
+    save(); closeModal(); render();
+  });
+
+  // ── BOOT ──────────────────────────────────────────────────────────────
+  load();
+  render();
+</script>
+</body>
+</html>
