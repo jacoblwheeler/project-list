@@ -4,9 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Thompson Projects" />
   <title>Thompson's Project List</title>
+
+  <!-- iPad / iPhone home screen icon (generated inline via canvas) -->
+  <script>
+    (function(){
+      // Draw a 512x512 icon on a canvas and set it as the apple-touch-icon
+      const c = document.createElement('canvas');
+      c.width = c.height = 512;
+      const ctx = c.getContext('2d');
+
+      // Background gradient
+      const bg = ctx.createLinearGradient(0, 0, 512, 512);
+      bg.addColorStop(0, '#1a2744');
+      bg.addColorStop(1, '#243566');
+      ctx.fillStyle = bg;
+      // Rounded rect
+      const r = 110;
+      ctx.beginPath();
+      ctx.moveTo(r, 0); ctx.lineTo(512-r, 0);
+      ctx.quadraticCurveTo(512, 0, 512, r);
+      ctx.lineTo(512, 512-r);
+      ctx.quadraticCurveTo(512, 512, 512-r, 512);
+      ctx.lineTo(r, 512);
+      ctx.quadraticCurveTo(0, 512, 0, 512-r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Star / sparkle accents
+      function star(x, y, size, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI*2);
+        ctx.fill();
+      }
+      star(80, 90, 18, 'rgba(255,213,79,0.7)');
+      star(430, 70, 10, 'rgba(79,195,247,0.6)');
+      star(460, 420, 14, 'rgba(206,147,216,0.6)');
+      star(55, 430, 10, 'rgba(129,199,132,0.6)');
+
+      // Rocket emoji as large text
+      ctx.font = '240px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🚀', 256, 230);
+
+      // "TP" text below
+      ctx.font = 'bold 88px Georgia, serif';
+      ctx.fillStyle = '#FFD54F';
+      ctx.letterSpacing = '6px';
+      ctx.fillText('THOMPSON', 256, 410);
+
+      ctx.font = 'bold 44px Georgia, serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.fillText('PROJECT LIST', 256, 468);
+
+      const dataUrl = c.toDataURL('image/png');
+
+      // apple-touch-icon
+      const link = document.createElement('link');
+      link.rel = 'apple-touch-icon';
+      link.sizes = '512x512';
+      link.href = dataUrl;
+      document.head.appendChild(link);
+
+      // regular favicon
+      const fav = document.createElement('link');
+      fav.rel = 'icon';
+      fav.type = 'image/png';
+      fav.href = dataUrl;
+      document.head.appendChild(fav);
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
